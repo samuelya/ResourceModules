@@ -7,6 +7,7 @@ This module deploys a Virtual Hub.
 - [Resource Types](#Resource-Types)
 - [Parameters](#Parameters)
 - [Outputs](#Outputs)
+- [Cross-referenced modules](#Cross-referenced-modules)
 - [Deployment examples](#Deployment-examples)
 
 ## Resource Types
@@ -14,9 +15,9 @@ This module deploys a Virtual Hub.
 | Resource Type | API Version |
 | :-- | :-- |
 | `Microsoft.Authorization/locks` | [2017-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2017-04-01/locks) |
-| `Microsoft.Network/virtualHubs` | [2021-05-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-05-01/virtualHubs) |
-| `Microsoft.Network/virtualHubs/hubRouteTables` | [2021-05-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-05-01/virtualHubs/hubRouteTables) |
-| `Microsoft.Network/virtualHubs/hubVirtualNetworkConnections` | [2021-05-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-05-01/virtualHubs/hubVirtualNetworkConnections) |
+| `Microsoft.Network/virtualHubs` | [2021-08-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-08-01/virtualHubs) |
+| `Microsoft.Network/virtualHubs/hubRouteTables` | [2021-08-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-08-01/virtualHubs/hubRouteTables) |
+| `Microsoft.Network/virtualHubs/hubVirtualNetworkConnections` | [2021-08-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-08-01/virtualHubs/hubVirtualNetworkConnections) |
 
 ## Parameters
 
@@ -101,10 +102,15 @@ tags: {
 | `resourceGroupName` | string | The resource group the virtual hub was deployed into. |
 | `resourceId` | string | The resource ID of the virtual hub. |
 
+## Cross-referenced modules
+
+_None_
+
 ## Deployment examples
 
 The following module usage examples are retrieved from the content of the files hosted in the module's `.test` folder.
    >**Note**: The name of each example is based on the name of the file from which it is taken.
+
    >**Note**: Each example lists all the required parameters first, followed by the rest - each in alphabetical order.
 
 <h3>Example 1: Min</h3>
@@ -115,7 +121,7 @@ The following module usage examples are retrieved from the content of the files 
 
 ```bicep
 module virtualHubs './Microsoft.Network/virtualHubs/deploy.bicep' = {
-  name: '${uniqueString(deployment().name)}-virtualHubs'
+  name: '${uniqueString(deployment().name)}-VirtualHubs'
   params: {
     // Required parameters
     addressPrefix: '10.0.0.0/16'
@@ -162,7 +168,7 @@ module virtualHubs './Microsoft.Network/virtualHubs/deploy.bicep' = {
 
 ```bicep
 module virtualHubs './Microsoft.Network/virtualHubs/deploy.bicep' = {
-  name: '${uniqueString(deployment().name)}-virtualHubs'
+  name: '${uniqueString(deployment().name)}-VirtualHubs'
   params: {
     // Required parameters
     addressPrefix: '10.1.0.0/16'

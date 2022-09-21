@@ -4,8 +4,11 @@ param name string
 @description('Optional. The name of the Managed Virtual Network.')
 param managedVirtualNetworkName string = ''
 
-@description('Optional. The object for the configuration of a Integration Runtime.')
-param integrationRuntime object = {}
+@description('Optional. An array of managed private endpoints objects created in the Data Factory managed virtual network.')
+param managedPrivateEndpoints array = []
+
+@description('Optional. An array of objects for the configuration of an Integration Runtime.')
+param integrationRuntimes array = []
 
 @description('Optional. Location for all Resources.')
 param location string = resourceGroup().location
@@ -201,29 +204,30 @@ resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' = {
   }
 }
 
-module dataFactory_managedVirtualNetwork 'managedVirtualNetwork/deploy.bicep' = if (!empty(managedVirtualNetworkName)) {
+module dataFactory_managedVirtualNetwork 'managedVirtualNetworks/deploy.bicep' = if (!empty(managedVirtualNetworkName)) {
   name: '${uniqueString(deployment().name, location)}-DataFactory-ManagedVNet'
   params: {
     name: managedVirtualNetworkName
     dataFactoryName: dataFactory.name
+    managedPrivateEndpoints: managedPrivateEndpoints
     enableDefaultTelemetry: enableReferencedModulesTelemetry
   }
 }
 
-module dataFactory_integrationRuntime 'integrationRuntime/deploy.bicep' = if (!empty(integrationRuntime)) {
-  name: '${uniqueString(deployment().name, location)}-DataFactory-IntegrationRuntime'
+module dataFactory_integrationRuntimes 'integrationRuntimes/deploy.bicep' = [for (integrationRuntime, index) in integrationRuntimes: {
+  name: '${uniqueString(deployment().name, location)}-DataFactory-IntegrationRuntime-${index}'
   params: {
     dataFactoryName: dataFactory.name
     name: integrationRuntime.name
     type: integrationRuntime.type
     managedVirtualNetworkName: contains(integrationRuntime, 'managedVirtualNetworkName') ? integrationRuntime.managedVirtualNetworkName : ''
-    typeProperties: integrationRuntime.typeProperties
+    typeProperties: contains(integrationRuntime, 'typeProperties') ? integrationRuntime.typeProperties : {}
     enableDefaultTelemetry: enableReferencedModulesTelemetry
   }
   dependsOn: [
     dataFactory_managedVirtualNetwork
   ]
-}
+}]
 
 resource dataFactory_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
   name: '${dataFactory.name}-${lock}-lock'
@@ -254,7 +258,29 @@ module dataFactory_roleAssignments '.bicep/nested_roleAssignments.bicep' = [for 
     principalIds: roleAssignment.principalIds
     principalType: contains(roleAssignment, 'principalType') ? roleAssignment.principalType : ''
     roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
+    condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
+    delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
     resourceId: dataFactory.id
+  }
+}]
+
+module dataFactory_privateEndpoints '../../Microsoft.Network/privateEndpoints/deploy.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+  name: '${uniqueString(deployment().name, location)}-DataFactory-PrivateEndpoint-${index}'
+  params: {
+    groupIds: [
+      privateEndpoint.service
+    ]
+    name: contains(privateEndpoint, 'name') ? privateEndpoint.name : 'pe-${last(split(dataFactory.id, '/'))}-${privateEndpoint.service}-${index}'
+    serviceResourceId: dataFactory.id
+    subnetResourceId: privateEndpoint.subnetResourceId
+    enableDefaultTelemetry: enableReferencedModulesTelemetry
+    location: reference(split(privateEndpoint.subnetResourceId, '/subnets/')[0], '2020-06-01', 'Full').location
+    lock: contains(privateEndpoint, 'lock') ? privateEndpoint.lock : lock
+    privateDnsZoneGroup: contains(privateEndpoint, 'privateDnsZoneGroup') ? privateEndpoint.privateDnsZoneGroup : {}
+    roleAssignments: contains(privateEndpoint, 'roleAssignments') ? privateEndpoint.roleAssignments : []
+    tags: contains(privateEndpoint, 'tags') ? privateEndpoint.tags : {}
+    manualPrivateLinkServiceConnections: contains(privateEndpoint, 'manualPrivateLinkServiceConnections') ? privateEndpoint.manualPrivateLinkServiceConnections : []
+    customDnsConfigs: contains(privateEndpoint, 'customDnsConfigs') ? privateEndpoint.customDnsConfigs : []
   }
 }]
 

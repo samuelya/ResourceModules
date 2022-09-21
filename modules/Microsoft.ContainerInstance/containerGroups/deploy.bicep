@@ -10,8 +10,8 @@ param image string
 @description('Optional. Port to open on the container and the public IP address.')
 param ports array = [
   {
-    name: 'Tcp'
-    value: '443'
+    protocol: 'TCP'
+    port: '443'
   }
 ]
 
@@ -78,7 +78,7 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
   }
 }
 
-resource containergroup 'Microsoft.ContainerInstance/containerGroups@2021-03-01' = {
+resource containergroup 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = {
   name: name
   location: location
   identity: identity

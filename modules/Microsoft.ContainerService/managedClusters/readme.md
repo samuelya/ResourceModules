@@ -7,6 +7,7 @@ This module deploys Azure Kubernetes Cluster (AKS).
 - [Resource types](#Resource-types)
 - [Parameters](#Parameters)
 - [Outputs](#Outputs)
+- [Cross-referenced modules](#Cross-referenced-modules)
 - [Deployment examples](#Deployment-examples)
 
 ## Resource types
@@ -14,9 +15,9 @@ This module deploys Azure Kubernetes Cluster (AKS).
 | Resource Type | API Version |
 | :-- | :-- |
 | `Microsoft.Authorization/locks` | [2017-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2017-04-01/locks) |
-| `Microsoft.Authorization/roleAssignments` | [2020-10-01-preview](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2020-10-01-preview/roleAssignments) |
-| `Microsoft.ContainerService/managedClusters` | [2022-04-02-preview](https://docs.microsoft.com/en-us/azure/templates/Microsoft.ContainerService/2022-04-02-preview/managedClusters) |
-| `Microsoft.ContainerService/managedClusters/agentPools` | [2021-08-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.ContainerService/2021-08-01/managedClusters/agentPools) |
+| `Microsoft.Authorization/roleAssignments` | [2022-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2022-04-01/roleAssignments) |
+| `Microsoft.ContainerService/managedClusters` | [2022-06-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.ContainerService/2022-06-01/managedClusters) |
+| `Microsoft.ContainerService/managedClusters/agentPools` | [2022-06-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.ContainerService/2022-06-01/managedClusters/agentPools) |
 | `Microsoft.Insights/diagnosticSettings` | [2021-05-01-preview](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Insights/2021-05-01-preview/diagnosticSettings) |
 
 ## Parameters
@@ -37,7 +38,7 @@ This module deploys Azure Kubernetes Cluster (AKS).
 | :-- | :-- | :-- | :-- | :-- |
 | `aadProfileAdminGroupObjectIDs` | array | `[]` |  | Specifies the AAD group object IDs that will have admin role of the cluster. |
 | `aadProfileClientAppID` | string | `''` |  | The client AAD application ID. |
-| `aadProfileEnableAzureRBAC` | bool | `True` |  | Specifies whether to enable Azure RBAC for Kubernetes authorization. |
+| `aadProfileEnableAzureRBAC` | bool | `[parameters('enableRBAC')]` |  | Specifies whether to enable Azure RBAC for Kubernetes authorization. |
 | `aadProfileManaged` | bool | `True` |  | Specifies whether to enable managed AAD integration. |
 | `aadProfileServerAppID` | string | `''` |  | The server AAD application ID. |
 | `aadProfileServerAppSecret` | string | `''` |  | The server AAD application secret. |
@@ -80,7 +81,7 @@ This module deploys Azure Kubernetes Cluster (AKS).
 | `azurePolicyVersion` | string | `'v2'` |  | Specifies the azure policy version to use. |
 | `diagnosticEventHubAuthorizationRuleId` | string | `''` |  | Resource ID of the diagnostic event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to. |
 | `diagnosticEventHubName` | string | `''` |  | Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category. |
-| `diagnosticLogCategoriesToEnable` | array | `[cluster-autoscaler, kube-apiserver, kube-audit, kube-controller-manager, kube-scheduler]` | `[cluster-autoscaler, kube-apiserver, kube-audit, kube-controller-manager, kube-scheduler]` | The name of logs that will be streamed. |
+| `diagnosticLogCategoriesToEnable` | array | `[cluster-autoscaler, guard, kube-apiserver, kube-audit, kube-audit-admin, kube-controller-manager, kube-scheduler]` | `[cluster-autoscaler, guard, kube-apiserver, kube-audit, kube-audit-admin, kube-controller-manager, kube-scheduler]` | The name of logs that will be streamed. |
 | `diagnosticLogsRetentionInDays` | int | `365` |  | Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely. |
 | `diagnosticMetricsToEnable` | array | `[AllMetrics]` | `[AllMetrics]` | The name of metrics that will be streamed. |
 | `diagnosticSettingsName` | string | `[format('{0}-diagnosticSettings', parameters('name'))]` |  | The name of the diagnostic setting, if deployed. |
@@ -96,6 +97,7 @@ This module deploys Azure Kubernetes Cluster (AKS).
 | `enablePodSecurityPolicy` | bool | `False` |  | Whether to enable Kubernetes pod security policy. |
 | `enablePrivateCluster` | bool | `False` |  | Specifies whether to create the cluster as a private cluster or not. |
 | `enablePrivateClusterPublicFQDN` | bool | `False` |  | Whether to create additional public FQDN for private cluster or not. |
+| `enableRBAC` | bool | `True` |  | Whether to enable Kubernetes Role-Based Access Control. |
 | `enableSecretRotation` | string | `'false'` | `[false, true]` | Specifies whether the KeyvaultSecretsProvider add-on uses secret rotation. |
 | `httpApplicationRoutingEnabled` | bool | `False` |  | Specifies whether the httpApplicationRouting add-on is enabled or not. |
 | `ingressApplicationGatewayEnabled` | bool | `False` |  | Specifies whether the ingressApplicationGateway (AGIC) add-on is enabled or not. |
@@ -322,8 +324,8 @@ You can specify multiple user assigned identities to a resource by providing add
 ```json
 "userAssignedIdentities": {
     "value": {
-        "/subscriptions/12345678-1234-1234-1234-123456789012/resourcegroups/validation-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/adp-sxx-az-msi-x-001": {},
-        "/subscriptions/12345678-1234-1234-1234-123456789012/resourcegroups/validation-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/adp-sxx-az-msi-x-002": {}
+        "/subscriptions/<<subscriptionId>>/resourcegroups/validation-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/adp-sxx-az-msi-x-001": {},
+        "/subscriptions/<<subscriptionId>>/resourcegroups/validation-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/adp-sxx-az-msi-x-002": {}
     }
 }
 ```
@@ -336,8 +338,8 @@ You can specify multiple user assigned identities to a resource by providing add
 
 ```bicep
 userAssignedIdentities: {
-    '/subscriptions/12345678-1234-1234-1234-123456789012/resourcegroups/validation-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/adp-sxx-az-msi-x-001': {}
-    '/subscriptions/12345678-1234-1234-1234-123456789012/resourcegroups/validation-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/adp-sxx-az-msi-x-002': {}
+    '/subscriptions/<<subscriptionId>>/resourcegroups/validation-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/adp-sxx-az-msi-x-001': {}
+    '/subscriptions/<<subscriptionId>>/resourcegroups/validation-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/adp-sxx-az-msi-x-002': {}
 }
 ```
 
@@ -357,10 +359,15 @@ userAssignedIdentities: {
 | `resourceId` | string | The resource ID of the managed cluster. |
 | `systemAssignedPrincipalId` | string | The principal ID of the system assigned identity. |
 
+## Cross-referenced modules
+
+_None_
+
 ## Deployment examples
 
 The following module usage examples are retrieved from the content of the files hosted in the module's `.test` folder.
    >**Note**: The name of each example is based on the name of the file from which it is taken.
+
    >**Note**: Each example lists all the required parameters first, followed by the rest - each in alphabetical order.
 
 <h3>Example 1: Azure</h3>
@@ -371,7 +378,7 @@ The following module usage examples are retrieved from the content of the files 
 
 ```bicep
 module managedClusters './Microsoft.ContainerService/managedClusters/deploy.bicep' = {
-  name: '${uniqueString(deployment().name)}-managedClusters'
+  name: '${uniqueString(deployment().name)}-ManagedClusters'
   params: {
     // Required parameters
     name: '<<namePrefix>>-az-aks-azure-001'
@@ -616,7 +623,7 @@ module managedClusters './Microsoft.ContainerService/managedClusters/deploy.bice
 
 ```bicep
 module managedClusters './Microsoft.ContainerService/managedClusters/deploy.bicep' = {
-  name: '${uniqueString(deployment().name)}-managedClusters'
+  name: '${uniqueString(deployment().name)}-ManagedClusters'
   params: {
     // Required parameters
     name: '<<namePrefix>>-az-aks-kubenet-001'

@@ -7,12 +7,13 @@ This module deploys ContainerRegistry Registries Webhooks.
 - [Resource Types](#Resource-Types)
 - [Parameters](#Parameters)
 - [Outputs](#Outputs)
+- [Cross-referenced modules](#Cross-referenced-modules)
 
 ## Resource Types
 
 | Resource Type | API Version |
 | :-- | :-- |
-| `Microsoft.ContainerRegistry/registries/webhooks` | [2021-12-01-preview](https://docs.microsoft.com/en-us/azure/templates/Microsoft.ContainerRegistry/2021-12-01-preview/registries/webhooks) |
+| `Microsoft.ContainerRegistry/registries/webhooks` | [2022-02-01-preview](https://docs.microsoft.com/en-us/azure/templates/Microsoft.ContainerRegistry/2022-02-01-preview/registries/webhooks) |
 
 ## Parameters
 
@@ -91,3 +92,7 @@ tags: {
 | `resourceGroupName` | string | The name of the Azure container registry. |
 | `resourceId` | string | The resource ID of the webhook. |
 | `status` | string | The status of the webhook. |
+
+## Cross-referenced modules
+
+_None_
