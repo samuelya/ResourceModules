@@ -1024,7 +1024,7 @@ The following module usage examples are retrieved from the content of the files 
 
 ```bicep
 module virtualMachines './Microsoft.Compute/virtualMachines/deploy.bicep' = {
-  name: '${uniqueString(deployment().name)}-test-cvmlindef'
+  name: '${uniqueString(deployment().name)}-test-cvmlincom'
   params: {
     // Required parameters
     adminUsername: 'localAdminUser'
@@ -1158,7 +1158,7 @@ module virtualMachines './Microsoft.Compute/virtualMachines/deploy.bicep' = {
     location: '<location>'
     lock: 'CanNotDelete'
     monitoringWorkspaceId: '<monitoringWorkspaceId>'
-    name: '<<namePrefix>>cvmlindef'
+    name: '<<namePrefix>>cvmlincom'
     publicKeys: [
       {
         keyData: '<keyData>'
@@ -1382,7 +1382,7 @@ module virtualMachines './Microsoft.Compute/virtualMachines/deploy.bicep' = {
       "value": "<monitoringWorkspaceId>"
     },
     "name": {
-      "value": "<<namePrefix>>cvmlindef"
+      "value": "<<namePrefix>>cvmlincom"
     },
     "publicKeys": {
       "value": [
@@ -1695,7 +1695,7 @@ module virtualMachines './Microsoft.Compute/virtualMachines/deploy.bicep' = {
 
 ```bicep
 module virtualMachines './Microsoft.Compute/virtualMachines/deploy.bicep' = {
-  name: '${uniqueString(deployment().name)}-test-cvmwindef'
+  name: '${uniqueString(deployment().name)}-test-cvmwincom'
   params: {
     // Required parameters
     adminUsername: 'localAdminUser'
@@ -1847,7 +1847,7 @@ module virtualMachines './Microsoft.Compute/virtualMachines/deploy.bicep' = {
     location: '<location>'
     lock: 'CanNotDelete'
     monitoringWorkspaceId: '<monitoringWorkspaceId>'
-    name: '<<namePrefix>>cvmwindef'
+    name: '<<namePrefix>>cvmwincom'
     proximityPlacementGroupResourceId: '<proximityPlacementGroupResourceId>'
     roleAssignments: [
       {
@@ -2086,7 +2086,7 @@ module virtualMachines './Microsoft.Compute/virtualMachines/deploy.bicep' = {
       "value": "<monitoringWorkspaceId>"
     },
     "name": {
-      "value": "<<namePrefix>>cvmwindef"
+      "value": "<<namePrefix>>cvmwincom"
     },
     "proximityPlacementGroupResourceId": {
       "value": "<proximityPlacementGroupResourceId>"
