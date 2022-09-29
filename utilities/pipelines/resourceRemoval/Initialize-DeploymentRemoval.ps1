@@ -66,6 +66,7 @@ function Initialize-DeploymentRemoval {
         # The initial sequence is a general order-recommendation
         $removalSequence = @(
             'Microsoft.Authorization/locks',
+            'Microsoft.Authorization/roleAssignments',
             'Microsoft.Insights/diagnosticSettings',
             'Microsoft.Network/privateEndpoints/privateDnsZoneGroups',
             'Microsoft.Network/privateEndpoints',
@@ -73,6 +74,7 @@ function Initialize-DeploymentRemoval {
             'Microsoft.OperationalInsights/workspaces/linkedServices',
             'Microsoft.OperationalInsights/workspaces',
             'Microsoft.KeyVault/vaults',
+            'Microsoft.RecoveryServices/vaults',
             'Microsoft.Resources/resourceGroups',
             'Microsoft.Compute/virtualMachines'
         )
