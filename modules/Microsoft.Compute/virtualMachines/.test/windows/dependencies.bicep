@@ -31,6 +31,7 @@ param location string = resourceGroup().location
 var storageContainerName = 'scripts'
 var storageAccountCSEFileName = 'scriptExtensionMasterInstaller.ps1'
 var backupPolicyName = 'backupPolicy'
+var backupConfigName = 'vaultconfig'
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
   name: virtualNetworkName
@@ -103,6 +104,14 @@ resource recoveryServicesVault 'Microsoft.RecoveryServices/vaults@2022-04-01' = 
     tier: 'Standard'
   }
   properties: {
+  }
+
+  resource backupConfig 'backupConfig@2022-03-01' = {
+    name: backupConfigName
+    properties: {
+      enhancedSecurityState: 'Disabled'
+      softDeleteFeatureState: 'Disabled'
+    }
   }
 
   resource backupPolicy 'backupPolicies@2022-03-01' = {
