@@ -40,5 +40,5 @@ runs:
         }
         Write-Verbose "Publishing output: $compressedOutput" -Verbose
         # Write-Output "::set-output name=moduleTestFilePaths::$compressedOutput"
-        "moduleTestFilePaths=$compressedOutput" | Out-File -FilePath $GITHUB_OUTPUT
+        "moduleTestFilePaths=$compressedOutput" >> $GITHUB_OUTPUT
         Write-Output '::endgroup::'
