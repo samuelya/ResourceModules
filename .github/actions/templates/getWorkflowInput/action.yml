@@ -81,6 +81,6 @@ runs:
 
         # Output values to be accessed by next jobs
         # Write-Output "::set-output name=removeDeployment::$removeDeployment"
-        "removeDeployment=$removeDeployment" >> $GITHUB_OUTPUT
+        Write-Output "removeDeployment=$removeDeployment" >> $GITHUB_OUTPUT
         Write-Output '::endgroup::'
       shell: pwsh
