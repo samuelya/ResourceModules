@@ -93,7 +93,7 @@ runs:
     - name: Echo to Github output via pwsh
       id: gh_echo_pwsh
       shell: pwsh
-      run: Write-Host "testyps=testyps" >> "$GITHUB_OUTPUT"
+      run: Write-Host "testyps=testyps >> $GITHUB_OUTPUT"
     - run: echo "${{ steps.get-input-param-action.outputs.removeDeployment }}"
       shell: bash
     - run: echo "${{ steps.gh_echo_bash.outputs.testy }}"
