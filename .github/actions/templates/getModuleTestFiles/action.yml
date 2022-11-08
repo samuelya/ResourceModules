@@ -43,4 +43,4 @@ runs:
         echo "moduleTestFilePaths=$compressedOutput" >> $GITHUB_OUTPUT
         Write-Output '::endgroup::'
     - run: echo "${{ steps.get-module-test-file-paths.outputs.moduleTestFilePaths }}"
-      shell: pwsh
+      shell: bash
