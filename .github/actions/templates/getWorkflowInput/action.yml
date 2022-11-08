@@ -86,6 +86,9 @@ runs:
         Write-Output "testy=testy" >> $GITHUB_OUTPUT
         Write-Output '::endgroup::'
       shell: pwsh
+    - name: Output to Github summaries
+      shell: bash
+      run: cat "testy=testy" >> $GITHUB_OUTPUT
     - run: echo "${{ steps.get-input-param-action.outputs.removeDeployment }}"
       shell: bash
     - run: echo "${{ steps.get-input-param-action.outputs.testy }}"
