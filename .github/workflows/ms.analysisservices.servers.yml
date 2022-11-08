@@ -96,6 +96,7 @@ jobs:
     #     moduleTestFilePaths: ${{ fromJSON(needs.job_initialize_pipeline.outputs.moduleTestFilePaths) }}
     steps:
       - run: echo ${{ needs.job_initialize_pipeline.outputs.removeDeployment }}
+      - run: echo ${{ needs.job_initialize_pipeline.outputs.moduleTestFilePaths }}
 
   # #############################
   # #   Deployment validation   #
