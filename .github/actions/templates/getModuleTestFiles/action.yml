@@ -40,7 +40,7 @@ runs:
         }
         Write-Verbose "Publishing output: $compressedOutput" -Verbose
         # Write-Output "::set-output name=moduleTestFilePaths::$compressedOutput"
-        echo "moduleTestFilePaths=$compressedOutput" >> $GITHUB_OUTPUT
+        echo "moduleTestFilePaths=$compressedOutput" >> $env:GITHUB_OUTPUT
         Write-Output '::endgroup::'
     - run: echo "${{ steps.get-module-test-file-paths.outputs.moduleTestFilePaths }}"
       shell: bash
