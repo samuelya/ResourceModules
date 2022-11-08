@@ -83,7 +83,7 @@ runs:
         # Write-Output "::set-output name=removeDeployment::$removeDeployment"
         echo "removeDeployment=$removeDeployment" >> $GITHUB_OUTPUT
         $testy="testy"
-        echo "testy=$testy" >> $GITHUB_OUTPUT
+        Write-Output "testy=testy" >> $GITHUB_OUTPUT
         Write-Output '::endgroup::'
       shell: pwsh
     - run: echo "${{ steps.get-input-param-action.outputs.removeDeployment }}"
