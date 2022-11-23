@@ -73,8 +73,8 @@ function Expand-DeploymentBlock {
             }
 
             # Find end index of element
-            $isPropertyOrClosing = "^\s{$($topLevelIndent)}\w+:.+$|^}$"
-            if ($DeclarationBlock.content[$index + 1] -notmatch $isPropertyOrClosing) {
+            $isPropertyOrClosing = "^\s{$($topLevelIndent)}\w+:.+$|^}$|^}]$" # matches e.g. '  testvar: 123' & '}' & '}]'
+            if ($DeclarationBlock.content[$relativeElementStartIndex + 1] -notmatch $isPropertyOrClosing) {
                 # If the next line is not another element/property/param, it's a multi-line declaration
                 $relativeElementEndIndex = $relativeElementStartIndex
                 while ($DeclarationBlock.content[($relativeElementEndIndex + 1)] -notmatch $isPropertyOrClosing) {

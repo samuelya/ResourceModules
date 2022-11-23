@@ -77,9 +77,6 @@ function Resolve-ExistingTemplateContent {
 
         $templateContent = Get-Content -Path $TemplateFilePath
 
-
-        # TODO: Call yourself recursively for any child
-
         ############################
         ##   Extract Parameters   ##
         ############################
@@ -131,15 +128,37 @@ function Resolve-ExistingTemplateContent {
             $block['type'] = (($block.content | Where-Object { $_ -like 'output *' }) -split ' ')[2]
         }
 
+        #########################
+        ##   Extract Children  ##
+        #########################
+        $childReferences = $templateContent | ForEach-Object {
+            if ($_ -match "^module .+ '(.+)' =.*") {
+                $matches[1]
+            }
+        } | Select-Object -Unique | ForEach-Object {
+            (Resolve-Path (Join-Path (Split-Path $TemplateFilePath) $_)).Path
+        }
+
+        $nestedBlocks = @{}
+        foreach ($childReference in $childReferences) {
+            $identifier = 'Microsoft.{0}' -f (($childReference -replace '\\', '/') -split 'Microsoft\.')[1]
+            $nestedBlocks[$identifier] = Resolve-ExistingTemplateContent -TemplateFilePath $childReference
+        }
+
+
+        # module vpnSite_roleAssignments '.bicep/nested_roleAssignments.bicep' = [for (roleAssignment, index) in roleAssignments: {
+
+
         #######################
         ##   Return result   ##
         #######################
         return @{
-            parameters = $existingParameterBlocks
-            variables  = $existingVariableBlocks
-            resources  = $existingResourceBlocks
-            modules    = $existingModuleBlocks
-            outputs    = $existingOutputBlocks
+            parameters = $existingParameterBlocks ? $existingParameterBlocks : @()
+            variables  = $existingVariableBlocks ? $existingVariableBlocks : @()
+            resources  = $existingResourceBlocks ? $existingResourceBlocks : @()
+            modules    = $existingModuleBlocks ? $existingModuleBlocks : @()
+            outputs    = $existingOutputBlocks ? $existingOutputBlocks : @()
+            nested     = $nestedBlocks ? $nestedBlocks : @{}
         }
     }
 
