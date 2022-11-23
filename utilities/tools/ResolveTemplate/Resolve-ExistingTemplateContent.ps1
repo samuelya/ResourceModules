@@ -83,9 +83,14 @@ function Resolve-ExistingTemplateContent {
         $existingParameterBlocks = Read-DeclarationBlock -DeclarationContent $templateContent -DeclarationType 'param'
 
         # Analyze content
+        $parameterBlocks = @{}
         foreach ($block in $existingParameterBlocks) {
-            $block['name'] = (($block.content | Where-Object { $_ -like 'param *' }) -split ' ')[1]
+            $name = (($block.content | Where-Object { $_ -like 'param *' }) -split ' ')[1]
+
+            $block['description'] = $block.content | ForEach-Object { if ($_ -match "@description\('(.+)'\)") { $matches[1] } }
             $block['type'] = (($block.content | Where-Object { $_ -like 'param *' }) -split ' ')[2]
+
+            $parameterBlocks[$name] = $block
         }
 
         ###########################
@@ -94,8 +99,10 @@ function Resolve-ExistingTemplateContent {
         $existingVariableBlocks = Read-DeclarationBlock -DeclarationContent $templateContent -DeclarationType 'var'
 
         # Analyze content
+        $variableBlocks = @{}
         foreach ($block in $existingVariableBlocks) {
-            $block['name'] = (($block.content | Where-Object { $_ -like 'var *' }) -split ' ')[1]
+            $name = (($block.content | Where-Object { $_ -like 'var *' }) -split ' ')[1]
+            $variableBlocks[$name] = $block
         }
 
         ###########################
@@ -123,9 +130,14 @@ function Resolve-ExistingTemplateContent {
         #########################
         $existingOutputBlocks = Read-DeclarationBlock -DeclarationContent $templateContent -DeclarationType 'output'
 
+        # Analyze content
+        $outputBlocks = @{}
         foreach ($block in $existingOutputBlocks) {
-            $block['name'] = (($block.content | Where-Object { $_ -like 'output *' }) -split ' ')[1]
+            $name = (($block.content | Where-Object { $_ -like 'output *' }) -split ' ')[1]
+
             $block['type'] = (($block.content | Where-Object { $_ -like 'output *' }) -split ' ')[2]
+
+            $outputBlocks[$name] = $block
         }
 
         #########################
@@ -153,12 +165,12 @@ function Resolve-ExistingTemplateContent {
         ##   Return result   ##
         #######################
         return @{
-            parameters = $existingParameterBlocks ? $existingParameterBlocks : @()
-            variables  = $existingVariableBlocks ? $existingVariableBlocks : @()
-            resources  = $existingResourceBlocks ? $existingResourceBlocks : @()
-            modules    = $existingModuleBlocks ? $existingModuleBlocks : @()
-            outputs    = $existingOutputBlocks ? $existingOutputBlocks : @()
-            nested     = $nestedBlocks ? $nestedBlocks : @{}
+            Parameters = $parameterBlocks ? $parameterBlocks : @{}
+            Variables  = $variableBlocks ? $variableBlocks : @{}
+            Resources  = $existingResourceBlocks ? $existingResourceBlocks : @()
+            Modules    = $existingModuleBlocks ? $existingModuleBlocks : @()
+            Outputs    = $outputBlocks ? $outputBlocks : @{}
+            Nested     = $nestedBlocks ? $nestedBlocks : @{}
         }
     }
 

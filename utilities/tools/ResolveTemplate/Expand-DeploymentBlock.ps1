@@ -44,15 +44,15 @@ function Expand-DeploymentBlock {
         switch ($NestedType) {
             'properties' {
                 $declarationElem = $declarationBlock.content[0] -split ' '
-                $DeclarationBlock['name'] = $declarationElem[1]
-                $DeclarationBlock['type'] = ($declarationElem[2] -split '@')[0].Trim("'")
-                $DeclarationBlock['version'] = (($declarationElem[2] -split '@')[1])[0..9] -join '' # The date always has 10 characters
+                $DeclarationBlock['Name'] = $declarationElem[1]
+                $DeclarationBlock['Type'] = ($declarationElem[2] -split '@')[0].Trim("'")
+                $DeclarationBlock['ApiVersion'] = (($declarationElem[2] -split '@')[1])[0..9] -join '' # The date always has 10 characters
                 break
             }
             'params' {
                 $declarationElem = $declarationBlock.content[0] -split ' '
-                $DeclarationBlock['name'] = $declarationElem[1]
-                $DeclarationBlock['path'] = $declarationElem[2].Trim("'")
+                $DeclarationBlock['Name'] = $declarationElem[1]
+                $DeclarationBlock['Path'] = $declarationElem[2].Trim("'")
                 break
             }
         }
@@ -91,7 +91,7 @@ function Expand-DeploymentBlock {
             }
         }
 
-        $DeclarationBlock['topLevelElements'] = $topLevelElements
+        $DeclarationBlock['TopLevelElements'] = $topLevelElements
 
         #################################
         ##   Collect nested elements   ##
@@ -122,7 +122,7 @@ function Expand-DeploymentBlock {
             # --------------------
             if ($DeclarationBlock.content[$propertiesStartIndex] -like '*{*}*' -or $DeclarationBlock.content[$propertiesStartIndex + 1].Trim() -eq '}') {
                 # Empty properties block. Can be skipped.
-                $DeclarationBlock['nestedElements'] = @()
+                $DeclarationBlock['NestedElements'] = @()
             } else {
                 $nestedIndent = Get-LineIndentation -Line $DeclarationBlock.content[($propertiesStartIndex + 1)]
                 $relevantNestedProperties = $DeclarationBlock.content[($propertiesStartIndex + 1) .. ($propertiesEndIndex - 1)] | Where-Object { (Get-LineIndentation $_) -eq $nestedIndent -and $_ -match '^\s*\w+:.*' }
@@ -160,7 +160,7 @@ function Expand-DeploymentBlock {
                     }
                 }
 
-                $DeclarationBlock['nestedElements'] = $nestedElements
+                $DeclarationBlock['NestedElements'] = $nestedElements
             }
         }
     }
