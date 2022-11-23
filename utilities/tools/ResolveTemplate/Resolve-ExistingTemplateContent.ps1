@@ -77,6 +77,9 @@ function Resolve-ExistingTemplateContent {
 
         $templateContent = Get-Content -Path $TemplateFilePath
 
+
+        # TODO: Call yourself recursively for any child
+
         ############################
         ##   Extract Parameters   ##
         ############################

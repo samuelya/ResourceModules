@@ -1409,6 +1409,7 @@ function Set-ModuleReadMe {
     )
 
     # Load external functions
+    . (Join-Path $PSScriptRoot 'ResolveTemplate' 'Resolve-ExistingTemplateContent.ps1')
     . (Join-Path $PSScriptRoot 'helper' 'Merge-FileWithNewContent.ps1')
     . (Join-Path (Split-Path $PSScriptRoot -Parent) 'pipelines' 'sharedScripts' 'Get-NestedResourceList.ps1')
 
@@ -1421,7 +1422,7 @@ function Set-ModuleReadMe {
 
     if (-not $TemplateFileContent) {
         if ((Split-Path -Path $TemplateFilePath -Extension) -eq '.bicep') {
-            $templateFileContent = az bicep build --file $TemplateFilePath --stdout | ConvertFrom-Json -AsHashtable
+            $templateFileContent = Resolve-ExistingTemplateContent -TemplateFilePath $TemplateFilePath
         } else {
             $templateFileContent = ConvertFrom-Json (Get-Content $TemplateFilePath -Encoding 'utf8' -Raw) -ErrorAction Stop -AsHashtable
         }
