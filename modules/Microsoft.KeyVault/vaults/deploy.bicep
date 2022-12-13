@@ -166,11 +166,10 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
   }
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
-  name: name
-  location: location
-  tags: tags
-  properties: {
+module keyVault './deploy.simple.bicep' = {
+  name: '${uniqueString(deployment().name, location)}-KeyVault'
+  params: {
+    name: name
     enabledForDeployment: enableVaultForDeployment
     enabledForTemplateDeployment: enableVaultForTemplateDeployment
     enabledForDiskEncryption: enableVaultForDiskEncryption
@@ -185,12 +184,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
       name: vaultSku
       family: 'A'
     }
-    networkAcls: !empty(networkAcls) ? {
-      bypass: contains(networkAcls, 'bypass') ? networkAcls.bypass : null
-      defaultAction: contains(networkAcls, 'defaultAction') ? networkAcls.defaultAction : null
-      virtualNetworkRules: contains(networkAcls, 'virtualNetworkRules') ? networkAcls.virtualNetworkRules : []
-      ipRules: contains(networkAcls, 'ipRules') ? networkAcls.ipRules : []
-    } : null
+    networkAcls: networkAcls
     publicNetworkAccess: !empty(publicNetworkAccess) ? any(publicNetworkAccess) : (!empty(privateEndpoints) && empty(networkAcls) ? 'Disabled' : null)
   }
 }
