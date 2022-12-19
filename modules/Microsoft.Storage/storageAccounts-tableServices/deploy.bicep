@@ -107,7 +107,7 @@ resource tableServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings
   scope: tableServices
 }
 
-module tableServices_tables 'tables/deploy.bicep' = [for (tableName, index) in tables: {
+module tableServices_tables '../storageAccounts-tableServices-tables/deploy.bicep' = [for (tableName, index) in tables: {
   name: '${deployment().name}-Table-${index}'
   params: {
     storageAccountName: storageAccount.name

@@ -119,7 +119,7 @@ resource fileServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@
   scope: fileServices
 }
 
-module fileServices_shares 'shares/deploy.bicep' = [for (share, index) in shares: {
+module fileServices_shares '../storageAccounts-fileServices-shares/deploy.bicep' = [for (share, index) in shares: {
   name: '${deployment().name}-shares-${index}'
   params: {
     storageAccountName: storageAccount.name

@@ -107,7 +107,7 @@ resource queueServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings
   scope: queueServices
 }
 
-module queueServices_queues 'queues/deploy.bicep' = [for (queue, index) in queues: {
+module queueServices_queues '../storageAccounts-queueServices-queues/deploy.bicep' = [for (queue, index) in queues: {
   name: '${deployment().name}-Queue-${index}'
   params: {
     storageAccountName: storageAccount.name
