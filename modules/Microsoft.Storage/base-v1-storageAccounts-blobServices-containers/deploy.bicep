@@ -22,9 +22,6 @@ param publicAccess string = 'None'
 @description('Optional. Configure immutability policy.')
 param immutabilityPolicyProperties object = {}
 
-@description('Optional. Array of role assignment objects that contain the \'roleDefinitionIdOrName\' and \'principalId\' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: \'/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11\'.')
-param roleAssignments array = []
-
 @description('Optional. Enable telemetry via a Globally Unique Identifier (GUID).')
 param enableDefaultTelemetry bool = true
 
@@ -58,7 +55,7 @@ resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@20
   }
 }
 
-module immutabilityPolicy 'br/modules:microsoft.storage.storageaccounts.blobservices.containers.immutabilityPolicies:0' = if (!empty(immutabilityPolicyProperties)) {
+module immutabilityPolicy 'br/modules:microsoft.storage.base-v1-storageaccounts-blobservices-containers-immutabilitypolicies:0.0.1' = if (!empty(immutabilityPolicyProperties)) {
   name: immutabilityPolicyName
   params: {
     storageAccountName: storageAccount.name
@@ -69,19 +66,6 @@ module immutabilityPolicy 'br/modules:microsoft.storage.storageaccounts.blobserv
     enableDefaultTelemetry: enableReferencedModulesTelemetry
   }
 }
-
-module container_roleAssignments '.bicep/nested_roleAssignments.bicep' = [for (roleAssignment, index) in roleAssignments: {
-  name: '${deployment().name}-Rbac-${index}'
-  params: {
-    description: contains(roleAssignment, 'description') ? roleAssignment.description : ''
-    principalIds: roleAssignment.principalIds
-    principalType: contains(roleAssignment, 'principalType') ? roleAssignment.principalType : ''
-    roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
-    condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
-    delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
-    resourceId: container.id
-  }
-}]
 
 @description('The name of the deployed container.')
 output name string = container.name

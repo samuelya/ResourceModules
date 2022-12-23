@@ -93,19 +93,16 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
   }
 }
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing = {
-  name: storageAccountName
-}
-
-resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2021-09-01' = {
-  name: name
-  parent: storageAccount
-  properties: {
-    deleteRetentionPolicy: {
-      enabled: deleteRetentionPolicy
-      days: deleteRetentionPolicyDays
-    }
+module blobServicesBase 'br/modules:microsoft.storage.base-v1-storageaccounts-blobservices:0.0.1' = {
+  name: '${deployment().name}-Base'
+  param: {
+    storageAccountName: storageAccountName
+    name: name
+    enableDefaultTelemetry: enableReferencedModulesTelemetry
+    deleteRetentionPolicy: deleteRetentionPolicy
+    deleteRetentionPolicyDays: deleteRetentionPolicyDays
     automaticSnapshotPolicyEnabled: automaticSnapshotPolicyEnabled
+    containers: containers
   }
 }
 
@@ -122,24 +119,11 @@ resource blobServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@
   scope: blobServices
 }
 
-module blobServices_container 'br/modules:microsoft.storage.storageaccounts.blobservices.containers:0' = [for (container, index) in containers: {
-  name: '${deployment().name}-Container-${index}'
-  params: {
-    storageAccountName: storageAccount.name
-    blobServicesName: blobServices.name
-    name: container.name
-    publicAccess: contains(container, 'publicAccess') ? container.publicAccess : 'None'
-    roleAssignments: contains(container, 'roleAssignments') ? container.roleAssignments : []
-    immutabilityPolicyProperties: contains(container, 'immutabilityPolicyProperties') ? container.immutabilityPolicyProperties : {}
-    enableDefaultTelemetry: enableReferencedModulesTelemetry
-  }
-}]
-
 @description('The name of the deployed blob service.')
-output name string = blobServices.name
+output name string = blobServicesBase.outputs.name
 
 @description('The resource ID of the deployed blob service.')
-output resourceId string = blobServices.id
+output resourceId string = blobServicesBase.outputs.resourceId
 
 @description('The name of the deployed blob service.')
 output resourceGroupName string = resourceGroup().name

@@ -42,31 +42,16 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
   }
 }
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing = {
-  name: storageAccountName
-
-  resource blobServices 'blobServices@2021-09-01' existing = {
-    name: blobServicesName
-  }
-}
-
-resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-09-01' = {
-  name: name
-  parent: storageAccount::blobServices
-  properties: {
-    publicAccess: publicAccess
-  }
-}
-
-module immutabilityPolicy 'br/modules:microsoft.storage.storageaccounts.blobservices.containers.immutabilityPolicies:0' = if (!empty(immutabilityPolicyProperties)) {
-  name: immutabilityPolicyName
+module containerBase 'br/modules:microsoft.storage.base-v1-storageaccounts-blobservices-containers:0.0.1' = {
+  name: '${deployment().name}-Base'
   params: {
-    storageAccountName: storageAccount.name
-    blobServicesName: storageAccount::blobServices.name
-    containerName: container.name
-    immutabilityPeriodSinceCreationInDays: contains(immutabilityPolicyProperties, 'immutabilityPeriodSinceCreationInDays') ? immutabilityPolicyProperties.immutabilityPeriodSinceCreationInDays : 365
-    allowProtectedAppendWrites: contains(immutabilityPolicyProperties, 'allowProtectedAppendWrites') ? immutabilityPolicyProperties.allowProtectedAppendWrites : true
+    name: name
+    storageAccountName: storageAccountName
+    blobServicesName: blobServicesName
     enableDefaultTelemetry: enableReferencedModulesTelemetry
+    immutabilityPolicyName: immutabilityPolicyName
+    immutabilityPolicyProperties: immutabilityPolicyProperties
+    publicAccess: publicAccess
   }
 }
 
@@ -79,15 +64,15 @@ module container_roleAssignments '.bicep/nested_roleAssignments.bicep' = [for (r
     roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
     condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
     delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
-    resourceId: container.id
+    resourceId: containerBase.outputs.resourceId
   }
 }]
 
 @description('The name of the deployed container.')
-output name string = container.name
+output name string = containerBase.outputs.name
 
 @description('The resource ID of the deployed container.')
-output resourceId string = container.id
+output resourceId string = containerBase.outputs.resourceId
 
 @description('The resource group of the deployed container.')
 output resourceGroupName string = resourceGroup().name

@@ -11,7 +11,7 @@ param resourceGroupName string = 'ms.storage.storageaccounts-${serviceShort}-blo
 param location string = deployment().location
 
 @description('Optional. A short identifier for the kind of deployment. Should be kept short to not run into resource-name length-constraints.')
-param serviceShort string = 'ssabscipcom'
+param serviceShort string = 'ssabsccom'
 
 @description('Optional. Enable telemetry via a Globally Unique Identifier (GUID).')
 param enableDefaultTelemetry bool = true
@@ -44,7 +44,8 @@ module testDeployment '../../deploy.bicep' = {
   scope: resourceGroup
   name: '${uniqueString(deployment().name)}-test-${serviceShort}'
   params: {
-    containerName: resourceGroupResources.outputs.storageAccountContainerName
     storageAccountName: resourceGroupResources.outputs.storageAccountName
+    name: 'mycontainer'
+    enableDefaultTelemetry: enableDefaultTelemetry
   }
 }
