@@ -10,5 +10,13 @@
                 }
             }
         }
+    },
+    "moduleAliases": {
+        "br": {
+            "modules": {
+                "registry": "adpsxxazacrx001.azurecr.io",
+                "modulePath": "bicep/modules"
+            }
+        }
     }
 }
