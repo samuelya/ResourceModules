@@ -220,17 +220,17 @@ module storageAccount_privateEndpoints '../../Microsoft.Network/privateEndpoints
 }]
 
 // Lifecycle Policy
-module storageAccount_managementPolicies 'managementPolicies/deploy.bicep' = if (!empty(managementPolicyRules)) {
-  name: '${uniqueString(deployment().name, location)}-Storage-ManagementPolicies'
-  params: {
-    storageAccountName: storageAccount.name
-    rules: managementPolicyRules
-    enableDefaultTelemetry: enableReferencedModulesTelemetry
-  }
-}
+// module storageAccount_managementPolicies 'managementPolicies/deploy.bicep' = if (!empty(managementPolicyRules)) {
+//   name: '${uniqueString(deployment().name, location)}-Storage-ManagementPolicies'
+//   params: {
+//     storageAccountName: storageAccount.name
+//     rules: managementPolicyRules
+//     enableDefaultTelemetry: enableReferencedModulesTelemetry
+//   }
+// }
 
 // Containers
-module storageAccount_blobServices 'blobServices/deploy.bicep' = if (!empty(blobServices)) {
+module storageAccount_blobServices 'br/modules:microsoft.storage.carml-v1-storageaccounts-blobservices:0.0.1' = if (!empty(blobServices)) {
   name: '${uniqueString(deployment().name, location)}-Storage-BlobServices'
   params: {
     storageAccountName: storageAccount.name
@@ -249,61 +249,61 @@ module storageAccount_blobServices 'blobServices/deploy.bicep' = if (!empty(blob
   }
 }
 
-// File Shares
-module storageAccount_fileServices 'fileServices/deploy.bicep' = if (!empty(fileServices)) {
-  name: '${uniqueString(deployment().name, location)}-Storage-FileServices'
-  params: {
-    storageAccountName: storageAccount.name
-    diagnosticLogsRetentionInDays: contains(fileServices, 'diagnosticLogsRetentionInDays') ? fileServices.diagnosticLogsRetentionInDays : 365
-    diagnosticStorageAccountId: contains(fileServices, 'diagnosticStorageAccountId') ? fileServices.diagnosticStorageAccountId : ''
-    diagnosticEventHubAuthorizationRuleId: contains(fileServices, 'diagnosticEventHubAuthorizationRuleId') ? fileServices.diagnosticEventHubAuthorizationRuleId : ''
-    diagnosticEventHubName: contains(fileServices, 'diagnosticEventHubName') ? fileServices.diagnosticEventHubName : ''
-    diagnosticLogCategoriesToEnable: contains(fileServices, 'diagnosticLogCategoriesToEnable') ? fileServices.diagnosticLogCategoriesToEnable : []
-    diagnosticMetricsToEnable: contains(fileServices, 'diagnosticMetricsToEnable') ? fileServices.diagnosticMetricsToEnable : []
-    protocolSettings: contains(fileServices, 'protocolSettings') ? fileServices.protocolSettings : {}
-    shareDeleteRetentionPolicy: contains(fileServices, 'shareDeleteRetentionPolicy') ? fileServices.shareDeleteRetentionPolicy : {
-      enabled: true
-      days: 7
-    }
-    shares: contains(fileServices, 'shares') ? fileServices.shares : []
-    diagnosticWorkspaceId: contains(fileServices, 'diagnosticWorkspaceId') ? fileServices.diagnosticWorkspaceId : ''
-    enableDefaultTelemetry: enableReferencedModulesTelemetry
-  }
-}
+// // File Shares
+// module storageAccount_fileServices 'fileServices/deploy.bicep' = if (!empty(fileServices)) {
+//   name: '${uniqueString(deployment().name, location)}-Storage-FileServices'
+//   params: {
+//     storageAccountName: storageAccount.name
+//     diagnosticLogsRetentionInDays: contains(fileServices, 'diagnosticLogsRetentionInDays') ? fileServices.diagnosticLogsRetentionInDays : 365
+//     diagnosticStorageAccountId: contains(fileServices, 'diagnosticStorageAccountId') ? fileServices.diagnosticStorageAccountId : ''
+//     diagnosticEventHubAuthorizationRuleId: contains(fileServices, 'diagnosticEventHubAuthorizationRuleId') ? fileServices.diagnosticEventHubAuthorizationRuleId : ''
+//     diagnosticEventHubName: contains(fileServices, 'diagnosticEventHubName') ? fileServices.diagnosticEventHubName : ''
+//     diagnosticLogCategoriesToEnable: contains(fileServices, 'diagnosticLogCategoriesToEnable') ? fileServices.diagnosticLogCategoriesToEnable : []
+//     diagnosticMetricsToEnable: contains(fileServices, 'diagnosticMetricsToEnable') ? fileServices.diagnosticMetricsToEnable : []
+//     protocolSettings: contains(fileServices, 'protocolSettings') ? fileServices.protocolSettings : {}
+//     shareDeleteRetentionPolicy: contains(fileServices, 'shareDeleteRetentionPolicy') ? fileServices.shareDeleteRetentionPolicy : {
+//       enabled: true
+//       days: 7
+//     }
+//     shares: contains(fileServices, 'shares') ? fileServices.shares : []
+//     diagnosticWorkspaceId: contains(fileServices, 'diagnosticWorkspaceId') ? fileServices.diagnosticWorkspaceId : ''
+//     enableDefaultTelemetry: enableReferencedModulesTelemetry
+//   }
+// }
 
-// Queue
-module storageAccount_queueServices 'queueServices/deploy.bicep' = if (!empty(queueServices)) {
-  name: '${uniqueString(deployment().name, location)}-Storage-QueueServices'
-  params: {
-    storageAccountName: storageAccount.name
-    diagnosticLogsRetentionInDays: contains(queueServices, 'diagnosticLogsRetentionInDays') ? queueServices.diagnosticLogsRetentionInDays : 365
-    diagnosticStorageAccountId: contains(queueServices, 'diagnosticStorageAccountId') ? queueServices.diagnosticStorageAccountId : ''
-    diagnosticEventHubAuthorizationRuleId: contains(queueServices, 'diagnosticEventHubAuthorizationRuleId') ? queueServices.diagnosticEventHubAuthorizationRuleId : ''
-    diagnosticEventHubName: contains(queueServices, 'diagnosticEventHubName') ? queueServices.diagnosticEventHubName : ''
-    diagnosticLogCategoriesToEnable: contains(queueServices, 'diagnosticLogCategoriesToEnable') ? queueServices.diagnosticLogCategoriesToEnable : []
-    diagnosticMetricsToEnable: contains(queueServices, 'diagnosticMetricsToEnable') ? queueServices.diagnosticMetricsToEnable : []
-    queues: contains(queueServices, 'queues') ? queueServices.queues : []
-    diagnosticWorkspaceId: contains(queueServices, 'diagnosticWorkspaceId') ? queueServices.diagnosticWorkspaceId : ''
-    enableDefaultTelemetry: enableReferencedModulesTelemetry
-  }
-}
+// // Queue
+// module storageAccount_queueServices 'queueServices/deploy.bicep' = if (!empty(queueServices)) {
+//   name: '${uniqueString(deployment().name, location)}-Storage-QueueServices'
+//   params: {
+//     storageAccountName: storageAccount.name
+//     diagnosticLogsRetentionInDays: contains(queueServices, 'diagnosticLogsRetentionInDays') ? queueServices.diagnosticLogsRetentionInDays : 365
+//     diagnosticStorageAccountId: contains(queueServices, 'diagnosticStorageAccountId') ? queueServices.diagnosticStorageAccountId : ''
+//     diagnosticEventHubAuthorizationRuleId: contains(queueServices, 'diagnosticEventHubAuthorizationRuleId') ? queueServices.diagnosticEventHubAuthorizationRuleId : ''
+//     diagnosticEventHubName: contains(queueServices, 'diagnosticEventHubName') ? queueServices.diagnosticEventHubName : ''
+//     diagnosticLogCategoriesToEnable: contains(queueServices, 'diagnosticLogCategoriesToEnable') ? queueServices.diagnosticLogCategoriesToEnable : []
+//     diagnosticMetricsToEnable: contains(queueServices, 'diagnosticMetricsToEnable') ? queueServices.diagnosticMetricsToEnable : []
+//     queues: contains(queueServices, 'queues') ? queueServices.queues : []
+//     diagnosticWorkspaceId: contains(queueServices, 'diagnosticWorkspaceId') ? queueServices.diagnosticWorkspaceId : ''
+//     enableDefaultTelemetry: enableReferencedModulesTelemetry
+//   }
+// }
 
-// Table
-module storageAccount_tableServices 'tableServices/deploy.bicep' = if (!empty(tableServices)) {
-  name: '${uniqueString(deployment().name, location)}-Storage-TableServices'
-  params: {
-    storageAccountName: storageAccount.name
-    diagnosticLogsRetentionInDays: contains(tableServices, 'diagnosticLogsRetentionInDays') ? tableServices.diagnosticLogsRetentionInDays : 365
-    diagnosticStorageAccountId: contains(tableServices, 'diagnosticStorageAccountId') ? tableServices.diagnosticStorageAccountId : ''
-    diagnosticEventHubAuthorizationRuleId: contains(tableServices, 'diagnosticEventHubAuthorizationRuleId') ? tableServices.diagnosticEventHubAuthorizationRuleId : ''
-    diagnosticEventHubName: contains(tableServices, 'diagnosticEventHubName') ? tableServices.diagnosticEventHubName : ''
-    diagnosticLogCategoriesToEnable: contains(tableServices, 'diagnosticLogCategoriesToEnable') ? tableServices.diagnosticLogCategoriesToEnable : []
-    diagnosticMetricsToEnable: contains(tableServices, 'diagnosticMetricsToEnable') ? tableServices.diagnosticMetricsToEnable : []
-    tables: contains(tableServices, 'tables') ? tableServices.tables : []
-    diagnosticWorkspaceId: contains(tableServices, 'diagnosticWorkspaceId') ? tableServices.diagnosticWorkspaceId : ''
-    enableDefaultTelemetry: enableReferencedModulesTelemetry
-  }
-}
+// // Table
+// module storageAccount_tableServices 'tableServices/deploy.bicep' = if (!empty(tableServices)) {
+//   name: '${uniqueString(deployment().name, location)}-Storage-TableServices'
+//   params: {
+//     storageAccountName: storageAccount.name
+//     diagnosticLogsRetentionInDays: contains(tableServices, 'diagnosticLogsRetentionInDays') ? tableServices.diagnosticLogsRetentionInDays : 365
+//     diagnosticStorageAccountId: contains(tableServices, 'diagnosticStorageAccountId') ? tableServices.diagnosticStorageAccountId : ''
+//     diagnosticEventHubAuthorizationRuleId: contains(tableServices, 'diagnosticEventHubAuthorizationRuleId') ? tableServices.diagnosticEventHubAuthorizationRuleId : ''
+//     diagnosticEventHubName: contains(tableServices, 'diagnosticEventHubName') ? tableServices.diagnosticEventHubName : ''
+//     diagnosticLogCategoriesToEnable: contains(tableServices, 'diagnosticLogCategoriesToEnable') ? tableServices.diagnosticLogCategoriesToEnable : []
+//     diagnosticMetricsToEnable: contains(tableServices, 'diagnosticMetricsToEnable') ? tableServices.diagnosticMetricsToEnable : []
+//     tables: contains(tableServices, 'tables') ? tableServices.tables : []
+//     diagnosticWorkspaceId: contains(tableServices, 'diagnosticWorkspaceId') ? tableServices.diagnosticWorkspaceId : ''
+//     enableDefaultTelemetry: enableReferencedModulesTelemetry
+//   }
+// }
 
 @description('The resource ID of the deployed storage account.')
 output resourceId string = storageAccount.id

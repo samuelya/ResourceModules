@@ -213,11 +213,11 @@ module storageAccount_roleAssignments '.bicep/nested_roleAssignments.bicep' = [f
     roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
     condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
     delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
-    resourceId: storageAccount.id
+    resourceId: storageAccountBase.outputs.resourceId
   }
 }]
 
-module storageAccount_l0 'deploy.l0.bicep' = {
+module storageAccountBase 'br/modules:microsoft.storage.base-v1-storageaccounts:0.0.1' = {
   name: '${uniqueString(deployment().name, location)}-L0'
   params: {
     name: name
@@ -252,19 +252,19 @@ module storageAccount_l0 'deploy.l0.bicep' = {
 }
 
 @description('The resource ID of the deployed storage account.')
-output resourceId string = storageAccount.id
+output resourceId string = storageAccountBase.outputs.resourceId
 
 @description('The name of the deployed storage account.')
-output name string = storageAccount.name
+output name string = storageAccountBase.outputs.name
 
 @description('The resource group of the deployed storage account.')
 output resourceGroupName string = resourceGroup().name
 
 @description('The primary blob endpoint reference if blob services are deployed.')
-output primaryBlobEndpoint string = !empty(blobServices) && contains(blobServices, 'containers') ? reference('Microsoft.Storage/storageAccounts/${storageAccount.name}', '2019-04-01').primaryEndpoints.blob : ''
+output primaryBlobEndpoint string = !empty(blobServices) && contains(blobServices, 'containers') ? reference('Microsoft.Storage/storageAccounts/${name}', '2019-04-01').primaryEndpoints.blob : ''
 
 @description('The principal ID of the system assigned identity.')
-output systemAssignedPrincipalId string = systemAssignedIdentity && contains(storageAccount.identity, 'principalId') ? storageAccount.identity.principalId : ''
+output systemAssignedPrincipalId string = systemAssignedIdentity && contains(storageAccountBase.outputs.identity, 'principalId') ? storageAccountBase.outputs.identity.principalId : ''
 
 @description('The location the resource was deployed into.')
-output location string = storageAccount.location
+output location string = storageAccountBase.outputs.location
