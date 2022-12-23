@@ -95,7 +95,7 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
 
 module blobServicesBase 'br/modules:microsoft.storage.base-v1-storageaccounts-blobservices:0.0.1' = {
   name: '${deployment().name}-Base'
-  param: {
+  params: {
     storageAccountName: storageAccountName
     name: name
     enableDefaultTelemetry: enableReferencedModulesTelemetry
@@ -106,8 +106,8 @@ module blobServicesBase 'br/modules:microsoft.storage.base-v1-storageaccounts-bl
   }
 }
 
-resource blobServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
-  name: diagnosticSettingsName
+resource blobServices_diagnosticSettings 'Microsoft.Storage/storageAccounts/blobServices/providers/diagnosticSettings@2021-09-01' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
+  name: '${name}/Microsoft.Insights/${diagnosticSettingsName}'
   properties: {
     storageAccountId: !empty(diagnosticStorageAccountId) ? diagnosticStorageAccountId : null
     workspaceId: !empty(diagnosticWorkspaceId) ? diagnosticWorkspaceId : null
@@ -116,7 +116,6 @@ resource blobServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@
     metrics: diagnosticsMetrics
     logs: diagnosticsLogs
   }
-  scope: blobServices
 }
 
 @description('The name of the deployed blob service.')
