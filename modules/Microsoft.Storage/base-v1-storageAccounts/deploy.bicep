@@ -272,21 +272,21 @@ module storageAccount_fileServices 'br/modules:microsoft.storage.carml-v1-storag
 }
 
 // // Queue
-// module storageAccount_queueServices 'queueServices/deploy.bicep' = if (!empty(queueServices)) {
-//   name: '${uniqueString(deployment().name, location)}-Storage-QueueServices'
-//   params: {
-//     storageAccountName: storageAccount.name
-//     diagnosticLogsRetentionInDays: contains(queueServices, 'diagnosticLogsRetentionInDays') ? queueServices.diagnosticLogsRetentionInDays : 365
-//     diagnosticStorageAccountId: contains(queueServices, 'diagnosticStorageAccountId') ? queueServices.diagnosticStorageAccountId : ''
-//     diagnosticEventHubAuthorizationRuleId: contains(queueServices, 'diagnosticEventHubAuthorizationRuleId') ? queueServices.diagnosticEventHubAuthorizationRuleId : ''
-//     diagnosticEventHubName: contains(queueServices, 'diagnosticEventHubName') ? queueServices.diagnosticEventHubName : ''
-//     diagnosticLogCategoriesToEnable: contains(queueServices, 'diagnosticLogCategoriesToEnable') ? queueServices.diagnosticLogCategoriesToEnable : []
-//     diagnosticMetricsToEnable: contains(queueServices, 'diagnosticMetricsToEnable') ? queueServices.diagnosticMetricsToEnable : []
-//     queues: contains(queueServices, 'queues') ? queueServices.queues : []
-//     diagnosticWorkspaceId: contains(queueServices, 'diagnosticWorkspaceId') ? queueServices.diagnosticWorkspaceId : ''
-//     enableDefaultTelemetry: enableReferencedModulesTelemetry
-//   }
-// }
+module storageAccount_queueServices 'br/modules:microsoft.storage.carml-v1-storageaccounts-queueservices:0.0.1' = if (!empty(queueServices)) {
+  name: '${uniqueString(deployment().name, location)}-Storage-QueueServices'
+  params: {
+    storageAccountName: storageAccount.name
+    diagnosticLogsRetentionInDays: contains(queueServices, 'diagnosticLogsRetentionInDays') ? queueServices.diagnosticLogsRetentionInDays : 365
+    diagnosticStorageAccountId: contains(queueServices, 'diagnosticStorageAccountId') ? queueServices.diagnosticStorageAccountId : ''
+    diagnosticEventHubAuthorizationRuleId: contains(queueServices, 'diagnosticEventHubAuthorizationRuleId') ? queueServices.diagnosticEventHubAuthorizationRuleId : ''
+    diagnosticEventHubName: contains(queueServices, 'diagnosticEventHubName') ? queueServices.diagnosticEventHubName : ''
+    diagnosticLogCategoriesToEnable: contains(queueServices, 'diagnosticLogCategoriesToEnable') ? queueServices.diagnosticLogCategoriesToEnable : []
+    diagnosticMetricsToEnable: contains(queueServices, 'diagnosticMetricsToEnable') ? queueServices.diagnosticMetricsToEnable : []
+    queues: contains(queueServices, 'queues') ? queueServices.queues : []
+    diagnosticWorkspaceId: contains(queueServices, 'diagnosticWorkspaceId') ? queueServices.diagnosticWorkspaceId : ''
+    enableDefaultTelemetry: enableReferencedModulesTelemetry
+  }
+}
 
 // // Table
 // module storageAccount_tableServices 'tableServices/deploy.bicep' = if (!empty(tableServices)) {

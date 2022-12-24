@@ -2,17 +2,11 @@
 @description('Conditional. The name of the parent Storage Account. Required if the template is used in a standalone deployment.')
 param storageAccountName string
 
-@description('Optional. The name of the file service.')
+@description('Optional. The name of the queue service.')
 param name string = 'default'
 
-@description('Optional. Protocol settings for file service.')
-param protocolSettings object = {}
-
-@description('Optional. The service properties for soft delete.')
-param shareDeleteRetentionPolicy object = {
-  enabled: true
-  days: 7
-}
+@description('Optional. Queues to create.')
+param queues array = []
 
 @description('Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely.')
 @minValue(0)
@@ -30,9 +24,6 @@ param diagnosticEventHubAuthorizationRuleId string = ''
 
 @description('Optional. Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category.')
 param diagnosticEventHubName string = ''
-
-@description('Optional. File shares to create.')
-param shares array = []
 
 @description('Optional. Enable telemetry via a Globally Unique Identifier (GUID).')
 param enableDefaultTelemetry bool = true
@@ -93,20 +84,18 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
   }
 }
 
-module fileServices 'br/modules:microsoft.storage.base-v1-storageaccounts-fileservices:0.0.1' = {
-  name: '${deployment().name}-Base'
-  params: {
-    storageAccountName: storageAccountName
-    enableDefaultTelemetry: enableReferencedModulesTelemetry
-    name: name
-    protocolSettings: protocolSettings
-    shareDeleteRetentionPolicy: shareDeleteRetentionPolicy
-    shares: shares
-  }
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing = {
+  name: storageAccountName
 }
 
-resource fileServices_diagnosticSettings 'Microsoft.Storage/storageAccounts/fileServices/providers/diagnosticSettings@2021-09-01' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
-  name: '${name}/Microsoft.Insights/${diagnosticSettingsName}'
+resource queueServices 'Microsoft.Storage/storageAccounts/queueServices@2021-09-01' = {
+  name: name
+  parent: storageAccount
+  properties: {}
+}
+
+resource queueServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
+  name: diagnosticSettingsName
   properties: {
     storageAccountId: !empty(diagnosticStorageAccountId) ? diagnosticStorageAccountId : null
     workspaceId: !empty(diagnosticWorkspaceId) ? diagnosticWorkspaceId : null
@@ -115,13 +104,26 @@ resource fileServices_diagnosticSettings 'Microsoft.Storage/storageAccounts/file
     metrics: diagnosticsMetrics
     logs: diagnosticsLogs
   }
+  scope: queueServices
 }
 
+module queueServices_queues 'br/modules:microsoft.storage.carml-v1-storageaccounts-queueservices-queues:0.0.1' = [for (queue, index) in queues: {
+  name: '${deployment().name}-Queue-${index}'
+  params: {
+    storageAccountName: storageAccount.name
+    queueServicesName: queueServices.name
+    name: queue.name
+    metadata: contains(queue, 'metadata') ? queue.metadata : {}
+    roleAssignments: contains(queue, 'roleAssignments') ? queue.roleAssignments : []
+    enableDefaultTelemetry: enableReferencedModulesTelemetry
+  }
+}]
+
 @description('The name of the deployed file share service.')
-output name string = fileServices.outputs.name
+output name string = queueServices.name
 
 @description('The resource ID of the deployed file share service.')
-output resourceId string = fileServices.outputs.resourceId
+output resourceId string = queueServices.id
 
 @description('The resource group of the deployed file share service.')
 output resourceGroupName string = resourceGroup().name

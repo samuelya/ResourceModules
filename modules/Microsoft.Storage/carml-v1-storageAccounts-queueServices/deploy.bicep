@@ -84,18 +84,26 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
   }
 }
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing = {
-  name: storageAccountName
+module queueServices 'br/modules:microsoft.storage.base-v1-storageaccounts-queueservices:0.0.1' = {
+  name: '${deployment().name}-Base'
+  params: {
+    storageAccountName: storageAccountName
+    diagnosticEventHubAuthorizationRuleId: diagnosticEventHubAuthorizationRuleId
+    diagnosticEventHubName: diagnosticEventHubName
+    diagnosticLogCategoriesToEnable: diagnosticLogCategoriesToEnable
+    diagnosticLogsRetentionInDays: diagnosticLogsRetentionInDays
+    diagnosticMetricsToEnable: diagnosticMetricsToEnable
+    diagnosticSettingsName: diagnosticSettingsName
+    diagnosticStorageAccountId: diagnosticStorageAccountId
+    diagnosticWorkspaceId: diagnosticWorkspaceId
+    enableDefaultTelemetry: enableDefaultTelemetry
+    name: name
+    queues: queues
+  }
 }
 
-resource queueServices 'Microsoft.Storage/storageAccounts/queueServices@2021-09-01' = {
-  name: name
-  parent: storageAccount
-  properties: {}
-}
-
-resource queueServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
-  name: diagnosticSettingsName
+resource queueServices_diagnosticSettings 'Microsoft.Storage/storageAccounts/queueServices/providers/diagnosticSettings@2021-09-01' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
+  name: '${name}/Microsoft.Insights/${diagnosticSettingsName}'
   properties: {
     storageAccountId: !empty(diagnosticStorageAccountId) ? diagnosticStorageAccountId : null
     workspaceId: !empty(diagnosticWorkspaceId) ? diagnosticWorkspaceId : null
@@ -104,26 +112,13 @@ resource queueServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings
     metrics: diagnosticsMetrics
     logs: diagnosticsLogs
   }
-  scope: queueServices
 }
 
-module queueServices_queues '../storageAccounts-queueServices-queues/deploy.bicep' = [for (queue, index) in queues: {
-  name: '${deployment().name}-Queue-${index}'
-  params: {
-    storageAccountName: storageAccount.name
-    queueServicesName: queueServices.name
-    name: queue.name
-    metadata: contains(queue, 'metadata') ? queue.metadata : {}
-    roleAssignments: contains(queue, 'roleAssignments') ? queue.roleAssignments : []
-    enableDefaultTelemetry: enableReferencedModulesTelemetry
-  }
-}]
-
 @description('The name of the deployed file share service.')
-output name string = queueServices.name
+output name string = queueServices.outputs.name
 
 @description('The resource ID of the deployed file share service.')
-output resourceId string = queueServices.id
+output resourceId string = queueServices.outputs.resourceId
 
 @description('The resource group of the deployed file share service.')
 output resourceGroupName string = resourceGroup().name

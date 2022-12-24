@@ -37,10 +37,13 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing 
   }
 }
 
-resource queue 'Microsoft.Storage/storageAccounts/queueServices/queues@2021-09-01' = {
-  name: name
-  parent: storageAccount::queueServices
-  properties: {
+module queue 'br/modules:microsoft.storage.base-v1-storageaccounts-queueservices-queues:0.0.1' = {
+  name: '${deployment().name}-Base'
+  params: {
+    name: name
+    storageAccountName: storageAccountName
+    enableDefaultTelemetry: enableDefaultTelemetry
+    queueServicesName: queueServicesName
     metadata: metadata
   }
 }
@@ -54,7 +57,7 @@ module queue_roleAssignments '.bicep/nested_roleAssignments.bicep' = [for (roleA
     roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
     condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
     delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
-    resourceId: queue.id
+    resourceId: queue.outputs.resourceId
   }
 }]
 
@@ -62,7 +65,7 @@ module queue_roleAssignments '.bicep/nested_roleAssignments.bicep' = [for (roleA
 output name string = queue.name
 
 @description('The resource ID of the deployed queue.')
-output resourceId string = queue.id
+output resourceId string = queue.outputs.resourceId
 
 @description('The resource group of the deployed queue.')
 output resourceGroupName string = resourceGroup().name
