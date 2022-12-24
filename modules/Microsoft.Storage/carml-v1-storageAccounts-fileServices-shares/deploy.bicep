@@ -2,33 +2,35 @@
 @description('Conditional. The name of the parent Storage Account. Required if the template is used in a standalone deployment.')
 param storageAccountName string
 
-@description('Optional. Name of the blob service.')
-param blobServicesName string = 'default'
+@description('Conditional. The name of the parent file service. Required if the template is used in a standalone deployment.')
+param fileServicesName string = 'default'
 
-@description('Required. The name of the storage container to deploy.')
+@description('Required. The name of the file share to create.')
 param name string
 
-@description('Optional. Name of the immutable policy.')
-param immutabilityPolicyName string = 'default'
+@description('Optional. The maximum size of the share, in gigabytes. Must be greater than 0, and less than or equal to 5TB (5120). For Large File Shares, the maximum size is 102400.')
+param sharedQuota int = 5120
 
 @allowed([
-  'Container'
-  'Blob'
-  'None'
+  'NFS'
+  'SMB'
 ])
-@description('Optional. Specifies whether data in the container may be accessed publicly and the level of access.')
-param publicAccess string = 'None'
+@description('Optional. The authentication protocol that is used for the file share. Can only be specified when creating a share.')
+param enabledProtocols string = 'SMB'
 
-@description('Optional. Configure immutability policy.')
-param immutabilityPolicyProperties object = {}
+@allowed([
+  'AllSquash'
+  'NoRootSquash'
+  'RootSquash'
+])
+@description('Optional. Permissions for NFS file shares are enforced by the client OS rather than the Azure Files service. Toggling the root squash behavior reduces the rights of the root user for NFS shares.')
+param rootSquash string = 'NoRootSquash'
 
 @description('Optional. Array of role assignment objects that contain the \'roleDefinitionIdOrName\' and \'principalId\' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: \'/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11\'.')
 param roleAssignments array = []
 
 @description('Optional. Enable telemetry via a Globally Unique Identifier (GUID).')
 param enableDefaultTelemetry bool = true
-
-var enableReferencedModulesTelemetry = false
 
 resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
   name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
@@ -42,20 +44,26 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
   }
 }
 
-module container 'br/modules:microsoft.storage.base-v1-storageaccounts-blobservices-containers:0.0.1' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing = {
+  name: storageAccountName
+
+  resource fileService 'fileServices@2021-09-01' existing = {
+    name: fileServicesName
+  }
+}
+
+module fileShare 'br/modules:microsoft.storage.base-v1-storageaccounts-fileservices-shares:0.0.1' = {
   name: '${deployment().name}-Base'
   params: {
     name: name
     storageAccountName: storageAccountName
-    blobServicesName: blobServicesName
-    enableDefaultTelemetry: enableReferencedModulesTelemetry
-    immutabilityPolicyName: immutabilityPolicyName
-    immutabilityPolicyProperties: immutabilityPolicyProperties
-    publicAccess: publicAccess
+    sharedQuota: sharedQuota
+    rootSquash: rootSquash
+    enabledProtocols: enabledProtocols
   }
 }
 
-module container_roleAssignments '.bicep/nested_roleAssignments.bicep' = [for (roleAssignment, index) in roleAssignments: {
+module fileShare_roleAssignments '.bicep/nested_roleAssignments.bicep' = [for (roleAssignment, index) in roleAssignments: {
   name: '${deployment().name}-Rbac-${index}'
   params: {
     description: contains(roleAssignment, 'description') ? roleAssignment.description : ''
@@ -64,15 +72,15 @@ module container_roleAssignments '.bicep/nested_roleAssignments.bicep' = [for (r
     roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
     condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
     delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
-    resourceId: container.outputs.resourceId
+    resourceId: fileShare.outputs.resourceId
   }
 }]
 
-@description('The name of the deployed container.')
-output name string = container.outputs.name
+@description('The name of the deployed file share.')
+output name string = fileShare.outputs.name
 
-@description('The resource ID of the deployed container.')
-output resourceId string = container.outputs.resourceId
+@description('The resource ID of the deployed file share.')
+output resourceId string = fileShare.outputs.resourceId
 
-@description('The resource group of the deployed container.')
+@description('The resource group of the deployed file share.')
 output resourceGroupName string = resourceGroup().name
