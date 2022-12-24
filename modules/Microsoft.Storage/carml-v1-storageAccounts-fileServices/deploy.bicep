@@ -119,16 +119,14 @@ resource fileServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@
   scope: fileServices
 }
 
-module fileServices_shares '../storageAccounts-fileServices-shares/deploy.bicep' = [for (share, index) in shares: {
+module fileServices_shares 'br/modules:microsoft.storage.base-v1-storageaccounts-fileservices:0.0.1' = [for (share, index) in shares: {
   name: '${deployment().name}-shares-${index}'
   params: {
     storageAccountName: storageAccount.name
-    fileServicesName: fileServices.name
-    name: share.name
-    enabledProtocols: contains(share, 'enabledProtocols') ? share.enabledProtocols : 'SMB'
-    rootSquash: contains(share, 'rootSquash') ? share.rootSquash : 'NoRootSquash'
-    sharedQuota: contains(share, 'sharedQuota') ? share.sharedQuota : 5120
-    roleAssignments: contains(share, 'roleAssignments') ? share.roleAssignments : []
+    name: name
+    protocolSettings: protocolSettings
+    shareDeleteRetentionPolicy: shareDeleteRetentionPolicy
+    shares: shares
     enableDefaultTelemetry: enableReferencedModulesTelemetry
   }
 }]
