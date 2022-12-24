@@ -249,27 +249,27 @@ module storageAccount_blobServices 'br/modules:microsoft.storage.carml-v1-storag
   }
 }
 
-// // File Shares
-// module storageAccount_fileServices 'fileServices/deploy.bicep' = if (!empty(fileServices)) {
-//   name: '${uniqueString(deployment().name, location)}-Storage-FileServices'
-//   params: {
-//     storageAccountName: storageAccount.name
-//     diagnosticLogsRetentionInDays: contains(fileServices, 'diagnosticLogsRetentionInDays') ? fileServices.diagnosticLogsRetentionInDays : 365
-//     diagnosticStorageAccountId: contains(fileServices, 'diagnosticStorageAccountId') ? fileServices.diagnosticStorageAccountId : ''
-//     diagnosticEventHubAuthorizationRuleId: contains(fileServices, 'diagnosticEventHubAuthorizationRuleId') ? fileServices.diagnosticEventHubAuthorizationRuleId : ''
-//     diagnosticEventHubName: contains(fileServices, 'diagnosticEventHubName') ? fileServices.diagnosticEventHubName : ''
-//     diagnosticLogCategoriesToEnable: contains(fileServices, 'diagnosticLogCategoriesToEnable') ? fileServices.diagnosticLogCategoriesToEnable : []
-//     diagnosticMetricsToEnable: contains(fileServices, 'diagnosticMetricsToEnable') ? fileServices.diagnosticMetricsToEnable : []
-//     protocolSettings: contains(fileServices, 'protocolSettings') ? fileServices.protocolSettings : {}
-//     shareDeleteRetentionPolicy: contains(fileServices, 'shareDeleteRetentionPolicy') ? fileServices.shareDeleteRetentionPolicy : {
-//       enabled: true
-//       days: 7
-//     }
-//     shares: contains(fileServices, 'shares') ? fileServices.shares : []
-//     diagnosticWorkspaceId: contains(fileServices, 'diagnosticWorkspaceId') ? fileServices.diagnosticWorkspaceId : ''
-//     enableDefaultTelemetry: enableReferencedModulesTelemetry
-//   }
-// }
+// File Shares
+module storageAccount_fileServices 'br/modules:microsoft.storage.carml-v1-storageaccounts-fileservices:0.0.1' = if (!empty(fileServices)) {
+  name: '${uniqueString(deployment().name, location)}-Storage-FileServices'
+  params: {
+    storageAccountName: storageAccount.name
+    diagnosticLogsRetentionInDays: contains(fileServices, 'diagnosticLogsRetentionInDays') ? fileServices.diagnosticLogsRetentionInDays : 365
+    diagnosticStorageAccountId: contains(fileServices, 'diagnosticStorageAccountId') ? fileServices.diagnosticStorageAccountId : ''
+    diagnosticEventHubAuthorizationRuleId: contains(fileServices, 'diagnosticEventHubAuthorizationRuleId') ? fileServices.diagnosticEventHubAuthorizationRuleId : ''
+    diagnosticEventHubName: contains(fileServices, 'diagnosticEventHubName') ? fileServices.diagnosticEventHubName : ''
+    diagnosticLogCategoriesToEnable: contains(fileServices, 'diagnosticLogCategoriesToEnable') ? fileServices.diagnosticLogCategoriesToEnable : []
+    diagnosticMetricsToEnable: contains(fileServices, 'diagnosticMetricsToEnable') ? fileServices.diagnosticMetricsToEnable : []
+    protocolSettings: contains(fileServices, 'protocolSettings') ? fileServices.protocolSettings : {}
+    shareDeleteRetentionPolicy: contains(fileServices, 'shareDeleteRetentionPolicy') ? fileServices.shareDeleteRetentionPolicy : {
+      enabled: true
+      days: 7
+    }
+    shares: contains(fileServices, 'shares') ? fileServices.shares : []
+    diagnosticWorkspaceId: contains(fileServices, 'diagnosticWorkspaceId') ? fileServices.diagnosticWorkspaceId : ''
+    enableDefaultTelemetry: enableReferencedModulesTelemetry
+  }
+}
 
 // // Queue
 // module storageAccount_queueServices 'queueServices/deploy.bicep' = if (!empty(queueServices)) {
