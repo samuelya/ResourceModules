@@ -220,14 +220,14 @@ module storageAccount_privateEndpoints '../../Microsoft.Network/privateEndpoints
 }]
 
 // Lifecycle Policy
-// module storageAccount_managementPolicies 'managementPolicies/deploy.bicep' = if (!empty(managementPolicyRules)) {
-//   name: '${uniqueString(deployment().name, location)}-Storage-ManagementPolicies'
-//   params: {
-//     storageAccountName: storageAccount.name
-//     rules: managementPolicyRules
-//     enableDefaultTelemetry: enableReferencedModulesTelemetry
-//   }
-// }
+module storageAccount_managementPolicies 'br/modules:microsoft.storage.base-v1-storageaccounts-managementpolicies:0.0.1' = if (!empty(managementPolicyRules)) {
+  name: '${uniqueString(deployment().name, location)}-Storage-ManagementPolicies'
+  params: {
+    storageAccountName: storageAccount.name
+    rules: managementPolicyRules
+    enableDefaultTelemetry: enableReferencedModulesTelemetry
+  }
+}
 
 // Containers
 module storageAccount_blobServices 'br/modules:microsoft.storage.carml-v1-storageaccounts-blobservices:0.0.1' = if (!empty(blobServices)) {
