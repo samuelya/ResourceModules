@@ -271,7 +271,7 @@ module storageAccount_fileServices 'br/modules:microsoft.storage.carml-v1-storag
   }
 }
 
-// // Queue
+// Queue
 module storageAccount_queueServices 'br/modules:microsoft.storage.carml-v1-storageaccounts-queueservices:0.0.1' = if (!empty(queueServices)) {
   name: '${uniqueString(deployment().name, location)}-Storage-QueueServices'
   params: {
@@ -288,22 +288,22 @@ module storageAccount_queueServices 'br/modules:microsoft.storage.carml-v1-stora
   }
 }
 
-// // Table
-// module storageAccount_tableServices 'tableServices/deploy.bicep' = if (!empty(tableServices)) {
-//   name: '${uniqueString(deployment().name, location)}-Storage-TableServices'
-//   params: {
-//     storageAccountName: storageAccount.name
-//     diagnosticLogsRetentionInDays: contains(tableServices, 'diagnosticLogsRetentionInDays') ? tableServices.diagnosticLogsRetentionInDays : 365
-//     diagnosticStorageAccountId: contains(tableServices, 'diagnosticStorageAccountId') ? tableServices.diagnosticStorageAccountId : ''
-//     diagnosticEventHubAuthorizationRuleId: contains(tableServices, 'diagnosticEventHubAuthorizationRuleId') ? tableServices.diagnosticEventHubAuthorizationRuleId : ''
-//     diagnosticEventHubName: contains(tableServices, 'diagnosticEventHubName') ? tableServices.diagnosticEventHubName : ''
-//     diagnosticLogCategoriesToEnable: contains(tableServices, 'diagnosticLogCategoriesToEnable') ? tableServices.diagnosticLogCategoriesToEnable : []
-//     diagnosticMetricsToEnable: contains(tableServices, 'diagnosticMetricsToEnable') ? tableServices.diagnosticMetricsToEnable : []
-//     tables: contains(tableServices, 'tables') ? tableServices.tables : []
-//     diagnosticWorkspaceId: contains(tableServices, 'diagnosticWorkspaceId') ? tableServices.diagnosticWorkspaceId : ''
-//     enableDefaultTelemetry: enableReferencedModulesTelemetry
-//   }
-// }
+// Table
+module storageAccount_tableServices 'br/modules:microsoft.storage.carml-v1-storageaccounts-tableservices:0.0.1' = if (!empty(tableServices)) {
+  name: '${uniqueString(deployment().name, location)}-Storage-TableServices'
+  params: {
+    storageAccountName: storageAccount.name
+    diagnosticLogsRetentionInDays: contains(tableServices, 'diagnosticLogsRetentionInDays') ? tableServices.diagnosticLogsRetentionInDays : 365
+    diagnosticStorageAccountId: contains(tableServices, 'diagnosticStorageAccountId') ? tableServices.diagnosticStorageAccountId : ''
+    diagnosticEventHubAuthorizationRuleId: contains(tableServices, 'diagnosticEventHubAuthorizationRuleId') ? tableServices.diagnosticEventHubAuthorizationRuleId : ''
+    diagnosticEventHubName: contains(tableServices, 'diagnosticEventHubName') ? tableServices.diagnosticEventHubName : ''
+    diagnosticLogCategoriesToEnable: contains(tableServices, 'diagnosticLogCategoriesToEnable') ? tableServices.diagnosticLogCategoriesToEnable : []
+    diagnosticMetricsToEnable: contains(tableServices, 'diagnosticMetricsToEnable') ? tableServices.diagnosticMetricsToEnable : []
+    tables: contains(tableServices, 'tables') ? tableServices.tables : []
+    diagnosticWorkspaceId: contains(tableServices, 'diagnosticWorkspaceId') ? tableServices.diagnosticWorkspaceId : ''
+    enableDefaultTelemetry: enableReferencedModulesTelemetry
+  }
+}
 
 @description('The resource ID of the deployed storage account.')
 output resourceId string = storageAccount.id

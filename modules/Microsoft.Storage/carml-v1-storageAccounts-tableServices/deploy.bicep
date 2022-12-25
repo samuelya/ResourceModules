@@ -88,14 +88,18 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing 
   name: storageAccountName
 }
 
-resource tableServices 'Microsoft.Storage/storageAccounts/tableServices@2021-09-01' = {
-  name: name
-  parent: storageAccount
-  properties: {}
+module tableServices 'br/modules:microsoft.storage.base-v1-storageaccounts-tableservices:0.0.1' = {
+  name: '${deployment().name}-Base'
+  params: {
+    storageAccountName: storageAccountName
+    name: name
+    tables: tables
+    enableDefaultTelemetry: enableReferencedModulesTelemetry
+  }
 }
 
-resource tableServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
-  name: diagnosticSettingsName
+resource tableServices_diagnosticSettings 'Microsoft.Storage/storageAccounts/tableServices/providers/diagnosticSettings@2021-09-01' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
+  name: '${name}/Microsoft.Insights/${diagnosticSettingsName}'
   properties: {
     storageAccountId: !empty(diagnosticStorageAccountId) ? diagnosticStorageAccountId : null
     workspaceId: !empty(diagnosticWorkspaceId) ? diagnosticWorkspaceId : null
@@ -104,24 +108,13 @@ resource tableServices_diagnosticSettings 'Microsoft.Insights/diagnosticSettings
     metrics: diagnosticsMetrics
     logs: diagnosticsLogs
   }
-  scope: tableServices
 }
 
-module tableServices_tables '../storageAccounts-tableServices-tables/deploy.bicep' = [for (tableName, index) in tables: {
-  name: '${deployment().name}-Table-${index}'
-  params: {
-    storageAccountName: storageAccount.name
-    tableServicesName: tableServices.name
-    name: tableName
-    enableDefaultTelemetry: enableReferencedModulesTelemetry
-  }
-}]
-
 @description('The name of the deployed table service.')
-output name string = tableServices.name
+output name string = tableServices.outputs.name
 
 @description('The resource ID of the deployed table service.')
-output resourceId string = tableServices.id
+output resourceId string = tableServices.outputs.resourceId
 
 @description('The resource group of the deployed table service.')
 output resourceGroupName string = resourceGroup().name
