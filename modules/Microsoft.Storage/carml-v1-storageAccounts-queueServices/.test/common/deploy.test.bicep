@@ -66,10 +66,13 @@ module testDeployment '../../deploy.bicep' = {
     diagnosticWorkspaceId: diagnosticDependencies.outputs.logAnalyticsWorkspaceResourceId
     diagnosticEventHubAuthorizationRuleId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
     diagnosticEventHubName: diagnosticDependencies.outputs.eventHubNamespaceEventHubName
-    shares: [
+    queues: [
       {
-        name: 'avdprofiles'
-        shareQuota: 5120
+        name: 'queue1'
+        metadata: {
+          key1: 'value1'
+          key2: 'value2'
+        }
         roleAssignments: [
           {
             roleDefinitionIdOrName: 'Reader'
@@ -81,8 +84,9 @@ module testDeployment '../../deploy.bicep' = {
         ]
       }
       {
-        name: 'avdprofiles2'
-        shareQuota: 5120
+        name: 'queue2'
+        metadata: {
+        }
       }
     ]
   }
