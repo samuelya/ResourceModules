@@ -237,7 +237,8 @@ resource workspace 'Microsoft.MachineLearningServices/workspaces@2022-05-01' = {
     } : null
     imageBuildCompute: imageBuildCompute
     primaryUserAssignedIdentity: primaryUserAssignedIdentity
-    publicNetworkAccess: !empty(publicNetworkAccess) ? any(publicNetworkAccess) : (!empty(privateEndpoints) ? 'Disabled' : 'Enabled')
+    publicNetworkAccess: null
+    // publicNetworkAccess: !empty(publicNetworkAccess) ? any(publicNetworkAccess) : (!empty(privateEndpoints) ? 'Disabled' : 'Enabled')
     serviceManagedResourcesSettings: serviceManagedResourcesSettings
     sharedPrivateLinkResources: sharedPrivateLinkResources
   }
