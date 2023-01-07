@@ -23,6 +23,6 @@
   - ... unless we move all extension resources into their own sub-module
     - Which would however introduce even more deployments
     - Would make the individual module completely useless compared to the native resource type (e.g. Locks)
-- Requires a strange mix of 'base' invoking CARML modules
+- Requires a strange mix of 'base' invoking 'carml' modules
 - Bigger hazard of too long TemplateSpec names for some modules (like RSV) if we spell all resource types out
 - Introduces additional deployments
