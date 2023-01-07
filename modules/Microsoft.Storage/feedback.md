@@ -6,7 +6,7 @@
 
 # Pro
 
--
+- Resource Types can be updated & tested without any changes in other modules
 
 # Con
 
