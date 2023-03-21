@@ -72,7 +72,8 @@ module testDeployment '../../deploy.bicep' = {
         name: '<<namePrefix>>-${serviceShort}-cm-001'
         endpoints: [
           {
-            name: '<<namePrefix>>-subnet-001(${resourceGroup.name})'
+            // name: '<<namePrefix>>-subnet-001(${resourceGroup.name})'
+            name: 'defaultSubnet(${resourceGroup.name})'
             resourceId: nestedDependencies.outputs.virtualMachineResourceId
             type: 'AzureVM'
           }
@@ -110,7 +111,8 @@ module testDeployment '../../deploy.bicep' = {
             disable: false
             name: 'test-http-Bing'
             sources: [
-              '<<namePrefix>>-subnet-001(${resourceGroup.name})'
+              // '<<namePrefix>>-subnet-001(${resourceGroup.name})'
+              'defaultSubnet(${resourceGroup.name})'
             ]
             testConfigurations: [
               'HTTP Bing Test'
