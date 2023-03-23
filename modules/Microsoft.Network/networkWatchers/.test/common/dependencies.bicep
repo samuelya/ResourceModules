@@ -115,7 +115,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-08-01' = {
     }
 }
 
-resource extension 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = {
+resource extension 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
     name: 'NetworkWatcherAgent'
     parent: virtualMachine
     location: location
