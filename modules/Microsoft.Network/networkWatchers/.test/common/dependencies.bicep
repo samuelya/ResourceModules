@@ -122,7 +122,7 @@ resource extension 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
     properties: {
         publisher: 'Microsoft.Azure.NetworkWatcher'
         type: 'NetworkWatcherAgentLinux'
-        typeHandlerVersion: '1.4.2573.1'
+        typeHandlerVersion: '1.4'
         autoUpgradeMinorVersion: true
         enableAutomaticUpgrade: false
         settings: {}
