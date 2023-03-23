@@ -115,14 +115,14 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-08-01' = {
     }
 }
 
-resource extension 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = {
+resource extension 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
     name: 'NetworkWatcherAgent'
     parent: virtualMachine
     location: location
     properties: {
         publisher: 'Microsoft.Azure.NetworkWatcher'
         type: 'NetworkWatcherAgentLinux'
-        typeHandlerVersion: '1.4'
+        typeHandlerVersion: '1.4.2573.1'
         autoUpgradeMinorVersion: true
         enableAutomaticUpgrade: false
         settings: {}
