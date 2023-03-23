@@ -20,6 +20,10 @@ param virtualMachineName string
 @secure()
 param password string = newGuid()
 
+@description('Optional. The user admin name to leverage for the VM login.')
+@secure()
+param adminUsername string = newGuid()
+
 var addressPrefix = '10.0.0.0/16'
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
@@ -105,7 +109,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-08-01' = {
             vmSize: 'Standard_B1ms'
         }
         osProfile: {
-            adminUsername: '${virtualMachineName}cake'
+            adminUsername: adminUsername
             adminPassword: password
             computerName: virtualMachineName
             linuxConfiguration: {
