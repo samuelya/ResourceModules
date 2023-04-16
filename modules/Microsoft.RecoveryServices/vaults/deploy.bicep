@@ -180,7 +180,9 @@ resource rsv 'Microsoft.RecoveryServices/vaults@2023-01-01' = {
   properties: {
     monitoringSettings: !empty(monitoringSettings) ? monitoringSettings : null
     securitySettings: !empty(securitySettings) ? securitySettings : null
-    publicNetworkAccess: publicNetworkAccess
+    // publicNetworkAccess: publicNetworkAccess
+    publicNetworkAccess: null
+
   }
 }
 
