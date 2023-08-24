@@ -1,0 +1,69 @@
+name: ".Platform: Publish All Missing CARML Modules"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "/.azuredevops/platformPipelines/platform.publishCarmlModules.yml"
+      - "/modules/*"
+
+env:
+  publishLatest: true
+jobs:
+  job_initialize_pipeline:
+    runs-on: ubuntu-20.04
+    name: "Initialize pipeline"
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: "Set input parameters to output variables"
+        id: get-workflow-param
+        uses: ./.github/actions/templates/getWorkflowInput
+        with:
+          workflowPath: "${{ env.workflowPath}}"
+
+    outputs:
+      workflowInput: ${{ steps.get-workflow-param.outputs.workflowInput }}
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Setup agent for deployment"
+        run: |
+          # Load used functions
+          . (Join-Path '$(env.profile)' '$(env.pipelineFunctionsPath)' 'sharedScripts' 'Set-EnvironmentOnAgent.ps1')
+          # Define PS modules to install on the runner
+          $Modules = @(
+              @{ Name = 'Az.Accounts' },
+              @{ Name = 'Az.ContainerRegistry' },
+              @{ Name = 'Az.Resources' }
+          )
+
+          # Set agent up
+          Set-EnvironmentOnAgent -PSModules $Modules
+
+      - name: "Deploy missing modules"
+        run: |
+          # Log into Az-PowerShell context
+          . $profile # Load PS-Profile configuration
+          $SecuredPassword = ConvertTo-SecureString -AsPlainText -String $env:servicePrincipalKey
+          $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $env:servicePrincipalId, $SecuredPassword
+          $null = Connect-AzAccount -ServicePrincipal -TenantId $env:tenantId -Credential $Credential
+
+          # load used functions
+            . (Join-Path '$(env.profile)' '$(env.pipelineFunctionsPath)' 'carmlModulesDeployment' 'Publish-AllMissingCarmlModules.ps1')
+            bicep --version
+            $modulePath = Join-Path '$(env.profile)' 'modules'
+
+            $inputObject = @{
+                    ModulesFolderPath = $modulePath
+                    BicepRegistryName = '$(bicepRegistryName)'
+                    BicepRegistryRgName = '$(bicepRegistryRgName)'
+                    bicepRegistryRgLocation = '$(bicepRegistryRgLocation)'
+                    PublishLatest = [bool]$env:publishLatest
+                    NotMatch = '$(customModuelsPrefix)'
+                }
+            Publish-AllMissingCarmlModules @inputObject -Verbose"
